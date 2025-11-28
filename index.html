@@ -365,7 +365,7 @@
             
             const privacyIcon = `<svg class="w-4 h-4 mr-1.5 text-[#0a1930]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${fingerprintPath}"></path></svg>`;
 
-            const privacyClass = card.privacy.type === 'warning' ? 'text-orange-500 font-bold' : 'text-[#66cc00] font-bold';
+            const privacyClass = card.privacy.type === 'warning' ? 'text-[#eab308] font-bold' : 'text-[#66cc00] font-bold';
             
             // Set % text color to match the most recent (31st) bar color
             const chartTextClass = recentDayStatus === 'red' ? 'text-red-500' : 
@@ -402,11 +402,13 @@
                     <div class="p-4 flex-grow">
                         <!-- Privacy Row -->
                         <div class="flex items-center text-[10px] uppercase font-bold tracking-wider text-[#0a1930] mb-4">
-                            <span class="mr-2">Data Privacy:</span>
-                            <div class="flex items-center ${privacyClass}">
-                                ${privacyIcon}
-                                ${card.privacy.status}
-                            </div>
+                                <span class="mr-2 flex items-center">
+                                    <span>Data Privacy</span>
+                                    <span class="ml-1">${privacyIcon}</span>
+                                </span>
+                                <div class="flex items-center ${privacyClass}">
+                                    ${card.privacy.status}
+                                </div>
                         </div>
 
                         <!-- Demand-Ability Bars (Full Width) -->
