@@ -261,13 +261,41 @@
 
         const grid = document.getElementById('card-grid');
 
-        // Generate 30 vertical bars with equal heights
-        function generateDemandBars(demandVal, color) {
-            let barClass = color === 'red' ? 'bar-red' : color === 'orange' ? 'bar-orange' : 'bar-green';
+        // Generate 30 vertical bars representing 30 days of historical demand data
+        function generateDemandBars(currentDemandVal, agentId) {
             let bars = '';
             
-            // Generate 30 bars with equal height
+            // Generate diverse historical data patterns for each agent
+            const seed = parseInt(agentId.split('-')[1]);
+            
             for (let i = 0; i < 30; i++) {
+                // Create varied historical patterns based on current demand and agent seed
+                let dailyDemand;
+                
+                if (currentDemandVal >= 85) {
+                    // High demand agents: mostly high values with some variation
+                    dailyDemand = 70 + Math.floor((Math.sin(seed * i * 0.3) * 15 + 15));
+                } else if (currentDemandVal >= 60) {
+                    // Medium demand agents: more varied pattern
+                    dailyDemand = 40 + Math.floor((Math.sin(seed * i * 0.4) * 25 + 20));
+                } else {
+                    // Low demand agents: mostly low values with occasional spikes
+                    dailyDemand = 20 + Math.floor((Math.sin(seed * i * 0.5) * 20 + 15));
+                }
+                
+                // Clamp values between 10 and 98
+                dailyDemand = Math.max(10, Math.min(98, dailyDemand));
+                
+                // Color based on thresholds: >75% = red, 50-75% = amber, <50% = green
+                let barClass;
+                if (dailyDemand > 75) {
+                    barClass = 'bar-red';
+                } else if (dailyDemand >= 50) {
+                    barClass = 'bar-orange';
+                } else {
+                    barClass = 'bar-green';
+                }
+                
                 bars += `<div class="demand-bar ${barClass}"></div>`;
             }
             
@@ -328,7 +356,7 @@
                                 <div class="text-sm font-bold ${chartTextClass}">${card.demand.val}%</div>
                             </div>
                             <div class="demand-bars">
-                                ${generateDemandBars(card.demand.val, card.demand.color)}
+                                ${generateDemandBars(card.demand.val, card.id)}
                             </div>
                         </div>
 
