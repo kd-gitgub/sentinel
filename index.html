@@ -35,7 +35,7 @@
         }
         
         .bar-red { background-color: #ef4444; }
-        .bar-orange { background-color: #f97316; }
+        .bar-orange { background-color: #eab308; }
         .bar-green { background-color: #84cc16; }
         .bar-gray { background-color: #e5e7eb; }
 
@@ -265,38 +265,62 @@
         function generateDemandBars(currentDemandVal, agentId) {
             let bars = '';
             
-            // Generate diverse historical data patterns for each agent
-            const seed = parseInt(agentId.split('-')[1]);
+            // Define specific patterns for each agent (days 1-30, left to right)
+            const agentPatterns = {
+                'AG-01': Array(30).fill('green'),  // All green
+                'AG-02': Array(30).fill('green').map((val, idx) => {
+                    if (idx === 22) return 'red';     // Day 23 (index 22) is red
+                    if (idx === 23) return 'orange';  // Day 24 (index 23) is amber
+                    return val;
+                }),
+                'AG-03': Array(30).fill('green'),  // All green
+                'AG-04': Array(30).fill('green'),  // All green
+                'AG-05': Array(30).fill('green').map((val, idx) => {
+                    return idx < 12 ? 'red' : 'green';  // Days 1-12 red, 13-30 green
+                }),
+                'AG-06': Array(30).fill('green'),  // Default pattern
+                'AG-07': Array(30).fill('green'),  // Default pattern
+                'AG-08': Array(30).fill('green'),  // Default pattern
+                'AG-09': Array(30).fill('green'),  // Default pattern
+                'AG-10': Array(30).fill('green'),  // Default pattern
+                'AG-11': Array(30).fill('green'),  // Default pattern
+                'AG-12': Array(30).fill('green')   // Default pattern
+            };
             
-            for (let i = 0; i < 30; i++) {
-                // Create varied historical patterns based on current demand and agent seed
-                let dailyDemand;
-                
-                if (currentDemandVal >= 85) {
-                    // High demand agents: mostly high values with some variation
-                    dailyDemand = 70 + Math.floor((Math.sin(seed * i * 0.3) * 15 + 15));
-                } else if (currentDemandVal >= 60) {
-                    // Medium demand agents: more varied pattern
-                    dailyDemand = 40 + Math.floor((Math.sin(seed * i * 0.4) * 25 + 20));
-                } else {
-                    // Low demand agents: mostly low values with occasional spikes
-                    dailyDemand = 20 + Math.floor((Math.sin(seed * i * 0.5) * 20 + 15));
+            // Get pattern for this agent, or use default varied pattern
+            const pattern = agentPatterns[agentId];
+            
+            if (pattern) {
+                // Use predefined pattern
+                for (let i = 0; i < 30; i++) {
+                    const barClass = pattern[i] === 'red' ? 'bar-red' : 
+                                   pattern[i] === 'orange' ? 'bar-orange' : 'bar-green';
+                    bars += `<div class="demand-bar ${barClass}"></div>`;
                 }
-                
-                // Clamp values between 10 and 98
-                dailyDemand = Math.max(10, Math.min(98, dailyDemand));
-                
-                // Color based on thresholds: >75% = red, 50-75% = amber, <50% = green
-                let barClass;
-                if (dailyDemand > 75) {
-                    barClass = 'bar-red';
-                } else if (dailyDemand >= 50) {
-                    barClass = 'bar-orange';
-                } else {
-                    barClass = 'bar-green';
+            } else {
+                // Fallback to varied pattern for undefined agents
+                const seed = parseInt(agentId.split('-')[1]);
+                for (let i = 0; i < 30; i++) {
+                    let dailyDemand;
+                    if (currentDemandVal >= 85) {
+                        dailyDemand = 70 + Math.floor((Math.sin(seed * i * 0.3) * 15 + 15));
+                    } else if (currentDemandVal >= 60) {
+                        dailyDemand = 40 + Math.floor((Math.sin(seed * i * 0.4) * 25 + 20));
+                    } else {
+                        dailyDemand = 20 + Math.floor((Math.sin(seed * i * 0.5) * 20 + 15));
+                    }
+                    dailyDemand = Math.max(10, Math.min(98, dailyDemand));
+                    
+                    let barClass;
+                    if (dailyDemand > 75) {
+                        barClass = 'bar-red';
+                    } else if (dailyDemand >= 50) {
+                        barClass = 'bar-orange';
+                    } else {
+                        barClass = 'bar-green';
+                    }
+                    bars += `<div class="demand-bar ${barClass}"></div>`;
                 }
-                
-                bars += `<div class="demand-bar ${barClass}"></div>`;
             }
             
             return bars;
