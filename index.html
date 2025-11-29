@@ -106,7 +106,7 @@
     </main>
 
     <script>
-        // Data Structure
+        // Data Structure - v0.7.1
         const cards = [
             {
                 id: "AG-01",
@@ -388,11 +388,8 @@
 
             const privacyClass = card.privacy.type === 'warning' ? 'text-[#eab308] font-bold' : 'text-[#66cc00] font-bold';
             
-            // Set % text color to match the most recent (31st) bar color
-            const percentageTextClass = recentDayStatus === 'red' ? 'text-red-500' : 
-                                        recentDayStatus === 'orange' ? 'text-orange-400' : 'text-[#84cc16]';
-            
-            // NOW text is always dark blue like the metric labels
+            // Both % and NOW text are always dark blue like the metric labels
+            const percentageTextClass = 'text-[#0a1930]';
             const nowTextClass = 'text-[#0a1930]';
 
             // Malice color logic
