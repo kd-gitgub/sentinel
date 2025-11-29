@@ -339,6 +339,25 @@
             return bars;
         }
 
+        // Generate blocking rate bars (all green)
+        function generateBlockingBars(agentId) {
+            let bars = '';
+            // Generate 30 green bars
+            for (let i = 0; i < 30; i++) {
+                bars += `<div class="demand-bar bar-green"></div>`;
+            }
+            // Add 31st green bar
+            bars += `<div class="demand-bar bar-green"></div>`;
+            return bars;
+        }
+
+        // Get blocking rate percentage
+        function getBlockingRate(agentId) {
+            // Random blocking rate between 5 and 25
+            const seed = parseInt(agentId.split('-')[1]);
+            return Math.floor(5 + (seed * 1.7) % 20);
+        }
+
         // Define agentPatterns globally so it can be accessed by both functions
         const agentPatterns = {
             'AG-01': Array(30).fill('green'),
@@ -458,7 +477,7 @@
                         </div>
 
                         <!-- Malice/Toxicity/Grounding Stats Row (All left-aligned, closer together) -->
-                        <div class="flex items-start gap-4">
+                        <div class="flex items-start gap-4 mb-4">
                             <div class="flex flex-col items-start">
                                 <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Malice</div>
                                 <div class="text-xl font-bold ${maliceClass} leading-none mt-1">${card.malice}</div>
@@ -470,6 +489,20 @@
                             <div class="flex flex-col items-start">
                                 <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Grounding</div>
                                 <div class="text-xl font-bold ${groundingClass} leading-none mt-1">${card.grounding}</div>
+                            </div>
+                        </div>
+
+                        <!-- Blocking Rate Bars -->
+                        <div class="flex flex-col">
+                            <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider mb-2">Blocking Rate</div>
+                            <div class="flex items-center gap-1.5 min-w-0">
+                                <div class="demand-bars flex-1 min-w-0">
+                                    ${generateBlockingBars(card.id)}
+                                </div>
+                                <div class="flex flex-col items-start flex-shrink-0">
+                                    <div class="text-sm font-bold ${percentageTextClass} leading-none whitespace-nowrap">${getBlockingRate(card.id)}%</div>
+                                    <div class="text-[10px] font-bold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Now</div>
+                                </div>
                             </div>
                         </div>
                     </div>
