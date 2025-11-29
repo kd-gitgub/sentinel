@@ -78,7 +78,7 @@
 
     <!-- Main Header -->
     <header class="bg-[#0A142D] rounded-none p-6 mb-8 shadow-xl max-w-[1400px] mx-auto">
-        <h1 class="text-2xl font-bold mb-4 text-white">Agent Safety & Alignment <span class="text-sm opacity-70">Version 0.7</span></h1>
+        <h1 class="text-2xl font-bold mb-4 text-white">Agent Safety & Alignment <span class="text-xs opacity-70">Version 0.7</span></h1>
         <div class="flex items-center justify-between w-full text-sm font-semibold">
             <div class="flex items-center gap-6">
                 <div class="flex items-center">
@@ -389,27 +389,30 @@
             const privacyClass = card.privacy.type === 'warning' ? 'text-[#eab308] font-bold' : 'text-[#66cc00] font-bold';
             
             // Set % text color to match the most recent (31st) bar color
-            const chartTextClass = recentDayStatus === 'red' ? 'text-red-500' : 
-                                   recentDayStatus === 'orange' ? 'text-orange-400' : 'text-[#0a1930]';
+            const percentageTextClass = recentDayStatus === 'red' ? 'text-red-500' : 
+                                        recentDayStatus === 'orange' ? 'text-orange-400' : 'text-[#84cc16]';
+            
+            // NOW text is always dark blue like the metric labels
+            const nowTextClass = 'text-[#0a1930]';
 
             // Malice color logic
             const maliceVal = parseFloat(card.malice);
             let maliceClass;
-            if (maliceVal < 2.2) maliceClass = 'text-[#0a1930]';
+            if (maliceVal < 2.2) maliceClass = 'text-[#84cc16]';
             else if (maliceVal >= 2.2 && maliceVal <= 3.6) maliceClass = 'text-[#eab308]';
             else maliceClass = 'text-red-500';
             
             // Toxicity color logic
             const toxicityVal = parseFloat(card.toxicity);
             let toxicityClass;
-            if (toxicityVal < 2.2) toxicityClass = 'text-[#0a1930]';
+            if (toxicityVal < 2.2) toxicityClass = 'text-[#84cc16]';
             else if (toxicityVal >= 2.2 && toxicityVal <= 3.6) toxicityClass = 'text-[#eab308]';
             else toxicityClass = 'text-red-500';
             
             // Grounding color logic
             const groundingVal = parseFloat(card.grounding);
             let groundingClass;
-            if (groundingVal < 2.2) groundingClass = 'text-[#0a1930]';
+            if (groundingVal < 2.2) groundingClass = 'text-[#84cc16]';
             else if (groundingVal >= 2.2 && groundingVal <= 3.6) groundingClass = 'text-[#eab308]';
             else groundingClass = 'text-red-500';
 
@@ -451,8 +454,8 @@
                                     ${generateDemandBars(card.demand.val, card.id)}
                                 </div>
                                 <div class="flex flex-col items-start flex-shrink-0">
-                                    <div class="text-sm font-bold ${chartTextClass} leading-none whitespace-nowrap">${card.demand.val}%</div>
-                                    <div class="text-[10px] font-bold ${chartTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Now</div>
+                                    <div class="text-sm font-bold ${percentageTextClass} leading-none whitespace-nowrap">${card.demand.val}%</div>
+                                    <div class="text-[10px] font-bold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Now</div>
                                 </div>
                             </div>
                         </div>
