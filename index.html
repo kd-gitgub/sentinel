@@ -471,7 +471,7 @@
                                 </div>
                                 <div class="flex flex-col items-start flex-shrink-0">
                                     <div class="text-sm font-bold ${percentageTextClass} leading-none whitespace-nowrap">${card.demand.val}%</div>
-                                    <div class="text-[10px] font-bold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Now</div>
+                                    <div class="text-[10px] font-bold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Load</div>
                                 </div>
                             </div>
                         </div>
@@ -494,14 +494,14 @@
 
                         <!-- Blocking Rate Bars -->
                         <div class="flex flex-col">
-                            <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider mb-2">Blocking Rate</div>
+                            <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider mb-2">Blocking Interventions</div>
                             <div class="flex items-center gap-1.5 min-w-0">
                                 <div class="demand-bars flex-1 min-w-0">
                                     ${generateBlockingBars(card.id)}
                                 </div>
                                 <div class="flex flex-col items-start flex-shrink-0">
                                     <div class="text-sm font-bold ${percentageTextClass} leading-none whitespace-nowrap">${getBlockingRate(card.id)}%</div>
-                                    <div class="text-[10px] font-bold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Now</div>
+                                    <div class="text-[10px] font-bold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Rate</div>
                                 </div>
                             </div>
                         </div>
