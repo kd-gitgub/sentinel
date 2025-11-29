@@ -341,24 +341,24 @@
             return bars;
         }
 
-        // Generate blocking rate bars (all dark blue with purple highlights)
+        // Generate blocking rate bars (all purple with dark blue highlights)
         function generateBlockingBars(agentId) {
             let bars = '';
             // Generate 30 bars
             for (let i = 0; i < 30; i++) {
-                let barClass = 'bar-dark';
-                // AG-01: bars 3 and 4 (index 2 and 3) are purple
+                let barClass = 'bar-purple';
+                // AG-01: bars 3 and 4 (index 2 and 3) are dark blue
                 if (agentId === 'AG-01' && (i === 2 || i === 3)) {
-                    barClass = 'bar-purple';
+                    barClass = 'bar-dark';
                 }
-                // AG-02: bar 23 (index 22) is purple
+                // AG-02: bar 23 (index 22) is dark blue
                 if (agentId === 'AG-02' && i === 22) {
-                    barClass = 'bar-purple';
+                    barClass = 'bar-dark';
                 }
                 bars += `<div class="demand-bar ${barClass}"></div>`;
             }
-            // Add 31st dark blue bar
-            bars += `<div class="demand-bar bar-dark"></div>`;
+            // Add 31st purple bar
+            bars += `<div class="demand-bar bar-purple"></div>`;
             return bars;
         }
 
