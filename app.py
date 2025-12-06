@@ -6,7 +6,6 @@ Version 0.7 - Streamlit-based Databricks App
 import streamlit as st
 from datetime import datetime
 
-# Must call st.set_page_config BEFORE any other streamlit command
 st.set_page_config(
     page_title="Agent Safety & Alignment",
     page_icon="🔒",
