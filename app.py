@@ -2,6 +2,7 @@ import math
 import textwrap
 import sys
 import streamlit as st
+from streamlit.components.v1 import html as st_html
 
 st.set_page_config(
     page_title="Agent Safety & Alignment",
@@ -555,10 +556,10 @@ with header_right:
     st.empty()
 
 # --- Grid --------------------------------------------------------------------
-st.markdown("<div class='card-grid'>", unsafe_allow_html=True)
-for card in cards:
-    st.markdown(render_card(card), unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
+cols = st.columns(4)
+for idx, card in enumerate(cards):
+    with cols[idx % 4]:
+        st_html(render_card(card), height=420, scrolling=False)
 
 # --- Footer note -------------------------------------------------------------
 st.caption(
