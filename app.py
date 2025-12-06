@@ -290,7 +290,7 @@ def render_card(card: dict) -> str:
     )
 
     privacy_icon = (
-        "<svg class='w-4 h-4 mr-1.5 text-black' fill='none' stroke='currentColor'"
+        "<svg class='icon icon-privacy' fill='none' stroke='currentColor'"
         " viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round'"
         " stroke-width='2' d='M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916"
         " 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0"
@@ -512,6 +512,7 @@ h1.title {
 .foot-item.right { justify-content: flex-end; text-align: right; }
 .foot-text { line-height: 1.2; }
 .icon { width: 16px; height: 16px; }
+.icon-privacy { width: 16px; height: 16px; margin-right: 6px; }
 
 .dot { width: 14px; height: 14px; border-radius: 999px; margin-top: 2px; }
 .status-dot-red { background: var(--red); animation: blink-red 0.6s step-end infinite; }
@@ -556,10 +557,11 @@ with header_right:
     st.empty()
 
 # --- Grid --------------------------------------------------------------------
-cols = st.columns(4)
-for idx, card in enumerate(cards):
-    with cols[idx % 4]:
-        st_html(render_card(card), height=420, scrolling=False)
+grid_html = CUSTOM_CSS + "<div class='card-grid'>" + "".join(
+    render_card(card) for card in cards
+) + "</div>"
+
+st_html(grid_html, height=1200, scrolling=True)
 
 # --- Footer note -------------------------------------------------------------
 st.caption(
