@@ -1,31 +1,12 @@
 """
 Agent Safety & Alignment Dashboard - Databricks App
-Version 0.7 - Streamlit-based Databricks App
+Flask-based web server
 """
 
-import streamlit as st
+from flask import Flask, render_template_string
 from datetime import datetime
 
-st.set_page_config(
-    page_title="Agent Safety & Alignment",
-    page_icon="🔒",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-# Apply CSS
-st.markdown("""
-    <style>
-        :root {
-            --primary-dark: #0A142D;
-            --accent-red: #ef4444;
-            --accent-orange: #eab308;
-            --accent-green: #84cc16;
-        }
-        body { background-color: #ffffff; color: #000000; font-family: 'Segoe UI', sans-serif; }
-        .header-container { background-color: var(--primary-dark); padding: 20px; color: white; margin-bottom: 20px; }
-    </style>
-""", unsafe_allow_html=True)
+app = Flask(__name__)
 
 # Agent data
 agents = [
@@ -43,52 +24,201 @@ agents = [
     {"id": "AG-12", "name": "Support-Agent-2-12", "model": "Llama-3-70B", "privacy": "SECURE", "demand": 27, "malice": 1.3, "toxicity": 1.4, "grounding": 4.4, "context": "8k", "step": "11/20"},
 ]
 
-# Header
-col1, col2 = st.columns([2, 1])
-with col1:
-    st.markdown("<div class='header-container'><h1 style='margin: 0; color: white;'>Agent Safety & Alignment</h1><p style='margin: 5px 0 0 0; font-size: 12px; opacity: 0.7; color: white;'>Version 0.7</p></div>", unsafe_allow_html=True)
-
-with col2:
-    st.markdown("<div class='header-container' style='text-align: right;'><div style='display: flex; gap: 16px; justify-content: flex-end;'><div><span style='display: inline-block; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; margin-right: 6px;'></span><span style='font-size: 12px;'>ACTIVE THREATS: 3</span></div><div><span style='display: inline-block; width: 10px; height: 10px; background-color: #eab308; border-radius: 50%; margin-right: 6px;'></span><span style='font-size: 12px;'>HIGH LOAD: 4</span></div></div></div>", unsafe_allow_html=True)
-
-# Dashboard
-cols = st.columns(4)
-
-for idx, agent in enumerate(agents):
-    with cols[idx % 4]:
-        status_color = "#ef4444" if (agent['malice'] > 3.6 or agent['demand'] > 75) else ("#eab308" if agent['demand'] >= 50 else "#84cc16")
-        malice_color = "red" if agent['malice'] > 3.6 else ("orange" if agent['malice'] >= 2.2 else "black")
-        toxicity_color = "red" if agent['toxicity'] > 3.6 else ("orange" if agent['toxicity'] >= 2.2 else "black")
-        grounding_color = "red" if agent['grounding'] > 3.6 else ("orange" if agent['grounding'] >= 2.2 else "black")
-        privacy_text = "🔐 SECURE" if "SECURE" in agent['privacy'] else "⚠️ " + agent['privacy']
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Safety & Alignment</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #f5f5f5; 
+            color: #000; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #0A142D 0%, #1a2847 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 32px; margin-bottom: 5px; }
+        .header-meta { font-size: 13px; opacity: 0.8; }
+        .stats { display: flex; gap: 20px; }
+        .stat { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .stat-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .threat { background-color: #ef4444; }
+        .load { background-color: #eab308; }
         
-        with st.container(border=True):
-            st.markdown(f"<div style='background-color: #0a1930; padding: 10px; margin: -10px -10px 10px -10px; color: white;'><div><span style='display: inline-block; width: 12px; height: 12px; background-color: {status_color}; border-radius: 50%;'></span> <strong>{agent['id']}</strong></div><div style='font-size: 9px; color: #9ca3af;'>Host: Databricks</div><div style='font-size: 13px; font-weight: bold;'>{agent['name']}</div><div style='font-size: 9px; color: #9ca3af;'>Model: {agent['model']}</div></div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='font-size: 11px; font-weight: bold; margin: 12px 0;'>DATA PRIVACY</div><div style='color: #84cc16; font-size: 12px; font-weight: bold;'>{privacy_text}</div>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown(f"<div style='font-size: 11px; font-weight: bold;'>DEMAND ABILITY: <strong>{agent['demand']}%</strong></div>", unsafe_allow_html=True)
-            st.divider()
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: box-shadow 0.3s;
+        }
+        .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        
+        .card-header {
+            background-color: #0a1930;
+            color: white;
+            padding: 15px;
+            font-size: 13px;
+        }
+        .card-id { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .card-id-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .card-id-text { font-weight: 600; font-size: 14px; }
+        .card-model { font-size: 12px; opacity: 0.7; margin-top: 3px; }
+        .card-name { font-weight: 600; font-size: 14px; margin: 8px 0 3px 0; }
+        
+        .card-body { padding: 15px; }
+        .section { margin-bottom: 12px; }
+        .section-label { font-size: 11px; font-weight: 600; color: #666; margin-bottom: 5px; text-transform: uppercase; }
+        .privacy { color: #84cc16; font-weight: 600; }
+        .demand-bar { background: #f0f0f0; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        .demand-fill { height: 100%; background: #3b82f6; transition: width 0.3s; }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 12px 0;
+            padding: 12px 0;
+            border-top: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .metric {
+            text-align: center;
+        }
+        .metric-label { font-size: 10px; color: #999; margin-bottom: 3px; }
+        .metric-value { font-size: 18px; font-weight: 600; }
+        .metric-red { color: #ef4444; }
+        .metric-orange { color: #eab308; }
+        .metric-black { color: #000; }
+        
+        .footer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🔒 Agent Safety & Alignment</h1>
+            <div class="header-meta">Real-time agent safety monitoring dashboard</div>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-dot threat"></div>
+                <span>ACTIVE THREATS: 3</span>
+            </div>
+            <div class="stat">
+                <div class="stat-dot load"></div>
+                <span>HIGH LOAD: 4</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid">
+        {% for agent in agents %}
+        {% set threat = (agent.malice > 3.6 or agent.demand > 75) %}
+        {% set high_load = (agent.demand >= 50 and agent.demand <= 75) %}
+        {% set malice_color = 'red' if agent.malice > 3.6 else ('orange' if agent.malice >= 2.2 else 'black') %}
+        {% set toxicity_color = 'red' if agent.toxicity > 3.6 else ('orange' if agent.toxicity >= 2.2 else 'black') %}
+        {% set grounding_color = 'red' if agent.grounding > 3.6 else ('orange' if agent.grounding >= 2.2 else 'black') %}
+        {% set status_color = '#ef4444' if threat else ('#eab308' if high_load else '#84cc16') %}
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-id">
+                    <div class="card-id-dot" style="background-color: {{ status_color }}"></div>
+                    <span class="card-id-text">{{ agent.id }}</span>
+                </div>
+                <div style="font-size: 11px; opacity: 0.7;">Host: Databricks</div>
+                <div class="card-name">{{ agent.name }}</div>
+                <div class="card-model">Model: {{ agent.model }}</div>
+            </div>
             
-            m1, m2, m3 = st.columns(3)
-            with m1:
-                st.markdown(f"<div style='text-align: center;'><div style='font-size: 10px; color: #666;'>MALICE</div><div style='font-size: 20px; font-weight: bold; color: {malice_color};'>{agent['malice']}</div></div>", unsafe_allow_html=True)
-            with m2:
-                st.markdown(f"<div style='text-align: center;'><div style='font-size: 10px; color: #666;'>TOXICITY</div><div style='font-size: 20px; font-weight: bold; color: {toxicity_color};'>{agent['toxicity']}</div></div>", unsafe_allow_html=True)
-            with m3:
-                st.markdown(f"<div style='text-align: center;'><div style='font-size: 10px; color: #666;'>GROUNDING</div><div style='font-size: 20px; font-weight: bold; color: {grounding_color};'>{agent['grounding']}</div></div>", unsafe_allow_html=True)
-            
-            st.divider()
-            f1, f2 = st.columns(2)
-            with f1:
-                st.markdown(f"<div style='font-size: 10px; color: #666;'>🔌 {agent['context']} Context</div>", unsafe_allow_html=True)
-            with f2:
-                st.markdown(f"<div style='font-size: 10px; color: #666; text-align: right;'>⚡ Step {agent['step']}</div>", unsafe_allow_html=True)
+            <div class="card-body">
+                <div class="section">
+                    <div class="section-label">Data Privacy</div>
+                    {% if 'SECURE' in agent.privacy %}
+                        <div class="privacy">🔐 SECURE</div>
+                    {% else %}
+                        <div class="privacy">⚠️ {{ agent.privacy }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Demand Ability</div>
+                    <div style="font-weight: 600;">{{ agent.demand }}%</div>
+                    <div class="demand-bar">
+                        <div class="demand-fill" style="width: {{ agent.demand }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">MALICE</div>
+                        <div class="metric-value metric-{{ malice_color }}">{{ agent.malice }}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">TOXICITY</div>
+                        <div class="metric-value metric-{{ toxicity_color }}">{{ agent.toxicity }}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">GROUNDING</div>
+                        <div class="metric-value metric-{{ grounding_color }}">{{ agent.grounding }}</div>
+                    </div>
+                </div>
+                
+                <div class="footer-info">
+                    <div>🔌 {{ agent.context }} Context</div>
+                    <div style="text-align: right;">⚡ Step {{ agent.step }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="app-footer">
+        Last updated: {{ timestamp }}
+    </div>
+</body>
+</html>
+"""
 
-# Sidebar
-with st.sidebar:
-    st.title("📊 Data Integration")
-    st.markdown("Connect your Databricks data sources to power this dashboard with live metrics.")
-    st.info("✅ App is running!")
+@app.route('/')
+def dashboard():
+    return render_template_string(HTML_TEMPLATE, agents=agents, timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC'))
 
-st.markdown("---")
-st.markdown(f"<p style='text-align: center; font-size: 12px; color: #999;'>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC</p>", unsafe_allow_html=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=False)
