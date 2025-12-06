@@ -303,83 +303,83 @@ def render_card(card: dict) -> str:
     grounding_val = float(card["grounding"])
 
     html = f"""
-<div class='card'>
-    <div class='card-head'>
-        <div class='id-block'>
-            <div class='dot {status_dot_class}'></div>
-            <div>
-                <div class='id-text'>{card['id'].replace('AG-', 'AG-0')}</div>
-                <div class='host-text'>Host: Databricks</div>
+    <div class='card'>
+        <div class='card-head'>
+            <div class='id-block'>
+                <div class='dot {status_dot_class}'></div>
+                <div>
+                    <div class='id-text'>{card['id'].replace('AG-', 'AG-0')}</div>
+                    <div class='host-text'>Host: Databricks</div>
+                </div>
+            </div>
+            <div class='name-block'>
+                <div class='name' title='{card['name']}'>{card['name']}</div>
+                <div class='meta'>Model: {card['model']}</div>
             </div>
         </div>
-        <div class='name-block'>
-            <div class='name' title='{card['name']}'>{card['name']}</div>
-            <div class='meta'>Model: {card['model']}</div>
-        </div>
-    </div>
 
-    <div class='card-body'>
-        <div class='section-row'>
-            <div class='section-label'>Data Privacy {privacy_icon}</div>
-            <div class='privacy {privacy_class}'>{card['privacy']['status']}</div>
-        </div>
+        <div class='card-body'>
+            <div class='section-row'>
+                <div class='section-label'>Data Privacy {privacy_icon}</div>
+                <div class='privacy {privacy_class}'>{card['privacy']['status']}</div>
+            </div>
 
-        <div class='section'>
-            <div class='section-title'>Demand Ability (Cognitive Load)</div>
-            <div class='bar-row'>
-                <div class='demand-bars'>{generate_demand_bars(card['demand']['val'], card['id'])}</div>
-                <div class='stat'>
-                    <div class='stat-value text-black'>{card['demand']['val']}%</div>
-                    <div class='stat-caption text-black'>Load</div>
+            <div class='section'>
+                <div class='section-title'>Demand Ability (Cognitive Load)</div>
+                <div class='bar-row'>
+                    <div class='demand-bars'>{generate_demand_bars(card['demand']['val'], card['id'])}</div>
+                    <div class='stat'>
+                        <div class='stat-value text-black'>{card['demand']['val']}%</div>
+                        <div class='stat-caption text-black'>Load</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='triple-row'>
+                <div class='triple-item'>
+                    <div class='triple-label'>Malice</div>
+                    <div class='triple-value {malice_class(malice_val)}'>{card['malice']}</div>
+                </div>
+                <div class='triple-item'>
+                    <div class='triple-label'>Toxicity</div>
+                    <div class='triple-value {toxicity_class(toxicity_val)}'>{card['toxicity']}</div>
+                </div>
+                <div class='triple-item'>
+                    <div class='triple-label'>Grounding</div>
+                    <div class='triple-value {grounding_class(grounding_val)}'>{card['grounding']}</div>
+                </div>
+            </div>
+
+            <div class='section'>
+                <div class='section-title'>Blocking Interventions</div>
+                <div class='bar-row'>
+                    <div class='demand-bars'>{generate_blocking_bars(card['id'])}</div>
+                    <div class='stat'>
+                        <div class='stat-value text-black'>{get_blocking_rate(card['id'])}%</div>
+                        <div class='stat-caption text-black'>Rate</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class='triple-row'>
-            <div class='triple-item'>
-                <div class='triple-label'>Malice</div>
-                <div class='triple-value {malice_class(malice_val)}'>{card['malice']}</div>
+        <div class='card-foot'>
+            <div class='foot-item'>
+                <svg class='icon text-blue' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2'
+                    d='M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z'></path>
+                </svg>
+                <div class='foot-text'>Risk: "Lost in the Middle" Syndrome / Buffer Usage<br><strong>{card['context']} Context</strong></div>
             </div>
-            <div class='triple-item'>
-                <div class='triple-label'>Toxicity</div>
-                <div class='triple-value {toxicity_class(toxicity_val)}'>{card['toxicity']}</div>
-            </div>
-            <div class='triple-item'>
-                <div class='triple-label'>Grounding</div>
-                <div class='triple-value {grounding_class(grounding_val)}'>{card['grounding']}</div>
-            </div>
-        </div>
-
-        <div class='section'>
-            <div class='section-title'>Blocking Interventions</div>
-            <div class='bar-row'>
-                <div class='demand-bars'>{generate_blocking_bars(card['id'])}</div>
-                <div class='stat'>
-                    <div class='stat-value text-black'>{get_blocking_rate(card['id'])}%</div>
-                    <div class='stat-caption text-black'>Rate</div>
-                </div>
+            <div class='foot-item right'>
+                <svg class='icon text-green' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2'
+                    d='M13 10V3L4 14h7v7l9-11h-7z'></path>
+                </svg>
+                <div class='foot-text'>Agentic Time Horizon / Loop Monitoring<br><strong>Step {card['step']}</strong></div>
             </div>
         </div>
     </div>
-
-    <div class='card-foot'>
-        <div class='foot-item'>
-            <svg class='icon text-blue' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2'
-                d='M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z'></path>
-            </svg>
-            <div class='foot-text'>Risk: "Lost in the Middle" Syndrome / Buffer Usage<br><strong>{card['context']} Context</strong></div>
-        </div>
-        <div class='foot-item right'>
-            <svg class='icon text-green' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2'
-                d='M13 10V3L4 14h7v7l9-11h-7z'></path>
-            </svg>
-            <div class='foot-text'>Agentic Time Horizon / Loop Monitoring<br><strong>Step {card['step']}</strong></div>
-        </div>
-    </div>
-</div>
-"""
+    """
 
     return textwrap.dedent(html).strip()
 
