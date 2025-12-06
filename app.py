@@ -17,8 +17,10 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import random
+import sys
+import traceback
 
-# Configure page
+# Configure page - MUST be first Streamlit command
 st.set_page_config(
     page_title="Agent Safety & Alignment",
     page_icon="🔒",
@@ -159,7 +161,8 @@ def get_demand_bars_color(value):
 # HEADER SECTION
 # ============================================================================
 
-col1, col2 = st.columns([2, 1])
+try:
+    col1, col2 = st.columns([2, 1])
 
 with col1:
     st.markdown("""
@@ -370,3 +373,8 @@ with st.sidebar:
 
 st.markdown("---")
 st.markdown(f"<p style='text-align: center; font-size: 12px; color: #999;'>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC</p>", unsafe_allow_html=True)
+
+except Exception as e:
+    st.error("❌ Application Error")
+    st.error(f"Error details: {str(e)}")
+    st.write(traceback.format_exc())
