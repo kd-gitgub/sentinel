@@ -423,13 +423,17 @@ h1.title {
     font-weight: 700;
 }
 
+.main-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
 .header {
     background: var(--nav);
     border-radius: 0;
     padding: 24px;
-    margin: 0 auto 32px auto;
+    margin-bottom: 32px;
     box-shadow: 0 10px 32px rgba(0,0,0,0.25);
-    max-width: 1400px;
 }
 
 .banner-row {
@@ -461,9 +465,6 @@ h1.title {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
-    max-width: 1400px;
-    margin: 0 auto 32px auto;
-    padding: 0 24px;
 }
 
 .card {
@@ -555,31 +556,29 @@ h1.title {
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 # --- Header ------------------------------------------------------------------
-header_left, header_right = st.columns([4, 1])
-with header_left:
-    st.markdown(
-        """
-        <div class='header'>
-            <h1 class='title'>Agent Safety & Alignment <span style='font-size:12px;opacity:0.7;'>Version 0.7</span></h1>
-            <div class='banner-row'>
-                <div style='display: flex; gap: 24px;'>
-                    <div class='banner-metric'><span class='badge' style='background:#ef4444;'></span> ACTIVE THREATS: 3</div>
-                    <div class='banner-metric'><span class='badge' style='background:#eab308;'></span> HIGH LOAD: 4</div>
-                    <div class='banner-metric'><span class='badge' style='background:#06b6d4;'></span> PII ALERTS: 4</div>
-                </div>
-                <div class='banner-metric'><span class='badge' style='background:#10b981;'></span> CAPTIVE AGENTS: {len(cards)}</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-with header_right:
-    st.empty()
+# (Header now rendered inside HTML component with grid)
+st.markdown("")  # Empty spacer
+
 
 # --- Grid --------------------------------------------------------------------
-grid_html = CUSTOM_CSS + "<div class='card-grid'>" + "".join(
-    render_card(card) for card in cards
-) + "</div>"
+grid_html = CUSTOM_CSS + """
+<div class='main-wrapper'>
+    <div class='header'>
+        <h1 class='title'>Agent Safety & Alignment <span style='font-size:12px;opacity:0.7;'>Version 0.7</span></h1>
+        <div class='banner-row'>
+            <div style='display: flex; gap: 24px;'>
+                <div class='banner-metric'><span class='badge' style='background:#ef4444;'></span> ACTIVE THREATS: 3</div>
+                <div class='banner-metric'><span class='badge' style='background:#eab308;'></span> HIGH LOAD: 4</div>
+                <div class='banner-metric'><span class='badge' style='background:#06b6d4;'></span> PII ALERTS: 4</div>
+            </div>
+            <div class='banner-metric'><span class='badge' style='background:#10b981;'></span> CAPTIVE AGENTS: """ + str(len(cards)) + """</div>
+        </div>
+    </div>
+    <div class='card-grid'>
+""" + "".join(render_card(card) for card in cards) + """
+    </div>
+</div>
+"""
 
 st_html(grid_html, height=2000, scrolling=True)
 
