@@ -464,7 +464,8 @@ h1.title {
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     max-width: 1400px;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .card {
@@ -527,7 +528,7 @@ h1.title {
 .triple-value { font-size: 21px; font-weight: 700; margin-top: 4px; }
 
 .card-foot { background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: 11px; font-weight: 600; }
-.foot-item { display: flex; align-items: center; gap: 6px; }
+.foot-item svg { display: none; }
 .foot-item.right { justify-content: flex-end; text-align: right; }
 .foot-text { line-height: 1.3; font-size: 10px; }
 .icon { width: 14px; height: 14px; }
@@ -563,9 +564,11 @@ with header_left:
         <div class='header'>
             <h1 class='title'>Agent Safety & Alignment <span style='font-size:12px;opacity:0.7;'>Version 0.7</span></h1>
             <div class='banner-row'>
-                <div class='banner-metric'><span class='badge' style='background:#ef4444;'></span> ACTIVE THREATS: 3</div>
-                <div class='banner-metric'><span class='badge' style='background:#eab308;'></span> HIGH LOAD: 4</div>
-                <div class='banner-metric'><span class='badge' style='background:#06b6d4;'></span> PII ALERTS: 4</div>
+                <div style='display: flex; gap: 24px;'>
+                    <div class='banner-metric'><span class='badge' style='background:#ef4444;'></span> ACTIVE THREATS: 3</div>
+                    <div class='banner-metric'><span class='badge' style='background:#eab308;'></span> HIGH LOAD: 4</div>
+                    <div class='banner-metric'><span class='badge' style='background:#06b6d4;'></span> PII ALERTS: 4</div>
+                </div>
                 <div class='banner-metric'><span class='badge' style='background:#10b981;'></span> CAPTIVE AGENTS: {len(cards)}</div>
             </div>
         </div>
