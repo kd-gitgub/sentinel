@@ -466,6 +466,7 @@ h1.title {
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
+    padding: 0 20px;
 }
 
 .card {
