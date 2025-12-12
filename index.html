@@ -3,549 +3,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safety & Alignment</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>AI Agent Monitor - Swap Reverted</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
-        
         body {
-            font-family: 'Segoe UI', 'Segoe UI Web (West European)', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
-            background: #ffffff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* Demand-Ability Bar Chart */
-        .demand-bars {
-            display: flex;
-            gap: 2.2px; /* Adjusted gap as requested */
-            height: 40px;
-            align-items: flex-end;
-            flex: 1;
-            min-width: 0;
+            background-color: #050505;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .viewport-16-9 {
+            width: 95vw;
+            aspect-ratio: 16/9;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+        }
+
+        .ticker-board {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 18px; /* Standard Header/Cell Size */
+            line-height: 1.4;
+            table-layout: auto; 
+        }
+
+        /* --- Header Styling --- */
+        .ticker-board th {
+            text-align: center;
+            padding: 8px 6px;
+            color: #ffffff;
+            font-weight: 400;
+            border-bottom: 2px solid #333;
+            vertical-align: bottom;
+            white-space: normal;
+            line-height: 1.1;
+        }
+
+        /* --- Row Styling --- */
+        .ticker-board tr {
+             border-bottom: none;
         }
         
-        .demand-bar {
-            width: 6px;
-            height: 40px;
-            flex-shrink: 2;
-            flex-grow: 0;
-            min-width: 2px;
-            max-width: 6px;
-            border-radius: 0;
-            image-rendering: crisp-edges;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: pixelated;
+        .ticker-board tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+
+        /* --- Cell Styling --- */
+        .ticker-board td {
+            padding: 8px 6px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 400;
+            vertical-align: middle;
+        }
+
+        /* --- SEPARATOR BORDERS --- */
+        
+        /* 1. Border between Agent Name and Kill Switch */
+        .ticker-board th:nth-child(2),
+        .ticker-board td:nth-child(2) {
+            border-right: 2px solid #333;
+            padding-right: 15px; 
         }
         
-        .bar-red { background-color: #ef4444; }
-        .bar-orange { background-color: #eab308; }
-        .bar-green { background-color: #84cc16; }
-        .bar-gray { background-color: #e5e7eb; }
-        .bar-dark { background-color: #0A142D; }
-        .bar-purple { background-color: #D7DDE8; }
-
-        /* Status Dot Colors */
-        .status-dot-red { 
-            background-color: #ef4444;
-            animation: blink-red 0.6s step-end infinite;
-        }
-        .status-dot-orange { 
-            background-color: #eab308;
-        }
-        .status-dot-green { background-color: #84cc16; }
-
-        @keyframes blink-red {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
+        .ticker-board th:nth-child(3),
+        .ticker-board td:nth-child(3) {
+            padding-left: 15px;
         }
 
-        /* Tooltip Logic */
-        .has-tooltip:hover .tooltip-content {
-            visibility: visible;
-            opacity: 1;
-            transform: translateY(0);
+        /* 2. Border between Time Horizon and DQ */
+        .ticker-board th:nth-child(11),
+        .ticker-board td:nth-child(11) {
+            border-right: 2px solid #333; 
+            padding-right: 15px; 
+            text-align: center;
         }
-        .tooltip-content {
-            visibility: hidden;
-            opacity: 0;
-            transform: translateY(4px);
-            transition: all 0.2s;
+        
+        /* Time Horizon Values: 14px */
+        .ticker-board td:nth-child(11) {
+            font-size: 14px;
+        }
+        
+        .ticker-board th:nth-child(12),
+        .ticker-board td:nth-child(12) {
+            padding-left: 15px;
         }
 
+        /* --- ALIGNMENT & SPACING ADJUSTMENTS --- */
+        .ticker-board th:nth-child(1),
+        .ticker-board td:nth-child(1) {
+            width: 90px;
+            max-width: 90px;
+            text-align: right;
+            padding-right: 20px;
+        }
+        
+        .ticker-board th:nth-child(2),
+        .ticker-board td:nth-child(2) {
+            text-align: left;
+            padding-left: 0px;
+            width: 140px; 
+        }
+
+        .ticker-board th:nth-child(3),
+        .ticker-board td:nth-child(3) {
+            text-align: center;
+            width: 100px; 
+        }
+
+        /* --- STATUS INDICATORS --- */
+        .dot {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* --- TREND TRIANGLES --- */
+        .trend-up {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 14px solid #ff1a1a;
+            display: inline-block;
+            margin-left: 8px;
+            margin-bottom: 1px;
+        }
+
+        .trend-down {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 14px solid #39ff14;
+            display: inline-block;
+            margin-left: 8px;
+            margin-bottom: -3px;
+        }
+
+        /* Animations */
+        @keyframes blinker {
+            0% { opacity: 1; }
+            49% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        .dot-green { background-color: #39ff14; box-shadow: 0 0 4px #39ff14; }
+        .dot-amber { background-color: #ffea00; box-shadow: 0 0 4px #ffea00; }
+        .dot-red { background-color: #ff1a1a; box-shadow: 0 0 4px #ff1a1a; }
+
+        /* Text Flash */
+        .text-flash {
+            font-size: 14px; 
+            font-weight: 700;
+            vertical-align: middle;
+            animation: blinker 1s infinite; 
+        }
+        
+        .status-text {
+            font-size: 14px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        /* --- Colors --- */
+        .std-text { color: #ffffff; }
+        .pos { color: #39ff14; }
+        .neg { color: #ff1a1a; font-weight: 700; } 
+        .warn { color: #ffea00; }
+
+        /* --- Texture --- */
+        .screen-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 0px,
+                rgba(0,0,0,0) 2px,
+                rgba(0,0,0,0.1) 3px,
+                rgba(0,0,0,0) 4px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Main Header -->
-    <header class="bg-[#0079FF] rounded-none p-6 mb-8 shadow-xl max-w-[1400px] mx-auto">
-        <h1 class="text-2xl font-bold mb-4 text-white">Agent Safety & Alignment <span class="text-xs opacity-70">Version 0.7</span></h1>
-        <div class="flex items-center justify-between w-full text-sm font-semibold">
-            <div class="flex items-center gap-6">
-                <div class="flex items-center">
-                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
-                    <span class="text-white">ACTIVE THREATS: 3</span>
-                </div>
-                <div class="flex items-center">
-                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>
-                    <span class="text-white">HIGH LOAD: 4</span>
-                </div>
-                <div class="flex items-center">
-                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 mr-2"></span>
-                    <span class="text-white">PII ALERTS: 4</span>
-                </div>
-            </div>
-            <div id="captive-agents" class="text-white">CAPTIVE AGENTS: 0</div>
-        </div>
-    </header>
-
-    <!-- Dashboard Grid -->
-    <main class="max-w-[1400px] mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="card-grid">
-            <!-- Cards will be injected here by JS -->
-        </div>
-    </main>
-
-    <script>
-        // Data Structure - v0.7.1
-        const cards = [
-            {
-                id: "AG-01",
-                name: "FinTech-Advisor-1-01",
-                model: "GPT-4o",
-                status: "red",
-                privacy: { status: "PII ALERT / SSN", type: "warning" },
-                demand: { val: 96, color: "red" },
-                malice: "4.9",
-                maliceColor: "red",
-                toxicity: "3.2",
-                grounding: "1.2", 
-                context: "93k",
-                step: "11/20"
-            },
-            {
-                id: "AG-02",
-                name: "Support-Agent-2-02",
-                model: "Claude-3.5-Sonnet",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 70, color: "green" },
-                malice: "1.4",
-                maliceColor: "dark",
-                toxicity: "1.8",
-                grounding: "4.8", 
-                context: "104k",
-                step: "15/20"
-            },
-            {
-                id: "AG-03",
-                name: "Code-Gen-3-03",
-                model: "Mistral-Large",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 65, color: "green" },
-                malice: "1.4",
-                maliceColor: "dark",
-                toxicity: "2.1",
-                grounding: "4.5",
-                context: "75k",
-                step: "17/20"
-            },
-            {
-                id: "AG-04",
-                name: "HR-Helper-4-04",
-                model: "Llama-3-70B",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 60, color: "green" },
-                malice: "1.6",
-                maliceColor: "dark",
-                toxicity: "1.5",
-                grounding: "4.9",
-                context: "103k",
-                step: "18/20"
-            },
-            {
-                id: "AG-05",
-                name: "Legal-Bot-0-05",
-                model: "GPT-4o",
-                status: "red",
-                privacy: { status: "PII ALERT / Credit Card", type: "warning" },
-                demand: { val: 94, color: "red" },
-                malice: "4.7",
-                maliceColor: "red",
-                toxicity: "3.7",
-                grounding: "2.1",
-                context: "53k",
-                step: "12/20"
-            },
-            {
-                id: "AG-06",
-                name: "FinTech-Advisor-1-06",
-                model: "Claude-3.5-Sonnet",
-                status: "green",
-                privacy: { status: "PII ALERT / Credit Card", type: "warning" },
-                demand: { val: 78, color: "orange" },
-                malice: "1.7",
-                maliceColor: "dark",
-                toxicity: "2.3",
-                grounding: "3.5",
-                context: "41k",
-                step: "6/20"
-            },
-            {
-                id: "AG-07",
-                name: "Support-Agent-2-07",
-                model: "Mistral-Large",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 46, color: "green" },
-                malice: "1.3",
-                maliceColor: "dark",
-                toxicity: "1.2",
-                grounding: "4.7",
-                context: "58k",
-                step: "12/20"
-            },
-            {
-                id: "AG-08",
-                name: "Code-Gen-3-08",
-                model: "Llama-3-70B",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 34, color: "green" },
-                malice: "0.6",
-                maliceColor: "dark",
-                toxicity: "0.7",
-                grounding: "5.0",
-                context: "39k",
-                step: "3/20"
-            },
-            {
-                id: "AG-09",
-                name: "HR-Helper-4-09",
-                model: "GPT-4o",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 33, color: "green" },
-                malice: "1.9",
-                maliceColor: "dark",
-                toxicity: "2.4",
-                grounding: "4.6",
-                context: "35k",
-                step: "10/20"
-            },
-            {
-                id: "AG-10",
-                name: "Legal-Bot-0-10",
-                model: "Claude-3.5-Sonnet",
-                status: "red",
-                privacy: { status: "PII ALERT / Credit Card", type: "warning" },
-                demand: { val: 86, color: "orange" },
-                malice: "4.6",
-                maliceColor: "red",
-                toxicity: "3.9",
-                grounding: "2.8",
-                context: "31k",
-                step: "12/20"
-            },
-            {
-                id: "AG-11",
-                name: "FinTech-Advisor-1-11",
-                model: "Mistral-Large",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 89, color: "orange" },
-                malice: "0.7",
-                maliceColor: "dark",
-                toxicity: "1.9",
-                grounding: "3.9",
-                context: "36k",
-                step: "12/20"
-            },
-            {
-                id: "AG-12",
-                name: "Support-Agent-2-12",
-                model: "Llama-3-70B",
-                status: "green",
-                privacy: { status: "SECURE", type: "secure" },
-                demand: { val: 27, color: "green" },
-                malice: "1.3",
-                maliceColor: "dark",
-                toxicity: "1.4",
-                grounding: "4.4",
-                context: "8k",
-                step: "11/20"
-            }
-        ];
-
-        const grid = document.getElementById('card-grid');
-        const captiveEl = document.getElementById('captive-agents');
-        if (captiveEl) captiveEl.textContent = `CAPTIVE AGENTS: ${cards.length}`;
-
-        // Get the most recent day's demand status for an agent
-        function getMostRecentDayStatus(agentId) {
-            const pattern = agentPatterns[agentId];
-            if (pattern) {
-                return pattern[29]; // Last day (index 29)
-            }
-            return 'green'; // Default
-        }
-
-        // Generate 30 vertical bars representing 30 days of historical demand data
-        function generateDemandBars(currentDemandVal, agentId) {
-            let bars = '';
-            
-            // Get pattern for this agent, or use default varied pattern
-            const pattern = agentPatterns[agentId];
-            
-            if (pattern) {
-                // Use predefined pattern
-                for (let i = 0; i < 30; i++) {
-                    const barClass = pattern[i] === 'red' ? 'bar-red' : 
-                                   pattern[i] === 'orange' ? 'bar-orange' : 'bar-green';
-                    bars += `<div class="demand-bar ${barClass}"></div>`;
-                }
-            } else {
-                // Fallback to varied pattern for undefined agents
-                const seed = parseInt(agentId.split('-')[1]);
-                for (let i = 0; i < 30; i++) {
-                    let dailyDemand;
-                    if (currentDemandVal >= 85) {
-                        dailyDemand = 70 + Math.floor((Math.sin(seed * i * 0.3) * 15 + 15));
-                    } else if (currentDemandVal >= 60) {
-                        dailyDemand = 40 + Math.floor((Math.sin(seed * i * 0.4) * 25 + 20));
-                    } else {
-                        dailyDemand = 20 + Math.floor((Math.sin(seed * i * 0.5) * 20 + 15));
-                    }
-                    dailyDemand = Math.max(10, Math.min(98, dailyDemand));
+    <div class="viewport-16-9">
+        <div class="screen-overlay"></div>
+        
+        <table class="ticker-board">
+            <thead>
+                <tr>
+                    <th>Agent ID</th>
+                    <th>Agent Name</th>
+                    <th>Kill<br>Switch</th>
                     
-                    let barClass;
-                    if (dailyDemand > 75) {
-                        barClass = 'bar-red';
-                    } else if (dailyDemand >= 50) {
-                        barClass = 'bar-orange';
-                    } else {
-                        barClass = 'bar-green';
-                    }
-                    bars += `<div class="demand-bar ${barClass}"></div>`;
-                }
-            }
-            
-            // Append a 31st bar using the most recent day's status color
-            const recentStatus = getMostRecentDayStatus(agentId);
-            const extraClass = recentStatus === 'red' ? 'bar-red' : (recentStatus === 'orange' ? 'bar-orange' : 'bar-green');
-            bars += `<div class="demand-bar ${extraClass}"></div>`;
-            
-            return bars;
-        }
+                    <th>Demand<br>Load</th>
+                    <th>Privacy</th>
+                    
+                    <th>Malice</th>
+                    <th>Toxicity</th>
+                    <th>Grounding</th>
+                    <th>Blocking<br>Rate</th>
+                    <th>LitM</th>
+                    <th>Time<br>Horizon</th>
+                    <th>DQ</th>
+                    <th>SYS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="std-text">AG_802</td>
+                    <td class="std-text">Nexus_Prime</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">88.4%<span class="trend-up"></span></td>
+                    <td class="pos">99.9%</td>
+                    
+                    <td class="pos">0.001</td>
+                    <td class="pos">0.02</td>
+                    <td class="pos">0.98</td>
+                    <td class="std-text">12.5%</td>
+                    <td class="pos">0.00</td>
+                    <td class="std-text">Step 5/9</td>
+                    <td><span class="dot dot-green"></span></td> 
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_803</td>
+                    <td class="std-text">Vanguard</td>
+                    <td class="pos status-text">ACTIVE</td> 
+                    
+                    <td class="neg">99.1%<span class="trend-up"></span></td>
+                    <td class="warn">92.0%</td>
+                    
+                    <td class="neg">0.450</td>
+                    <td class="neg">0.88</td>
+                    <td class="neg">0.42</td>
+                    <td class="std-text">45.2%</td>
+                    <td class="neg">0.75</td>
+                    <td class="std-text">Step 2/5</td>
+                    <td><span class="dot dot-amber"></span></td> 
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_804</td>
+                    <td class="std-text">Oracle_X</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">42.3%<span class="trend-down"></span></td>
+                    <td class="pos">99.5%</td>
+                    
+                    <td class="pos">0.000</td>
+                    <td class="pos">0.01</td>
+                    <td class="pos">0.99</td>
+                    <td class="std-text">0.40%</td>
+                    <td class="pos">0.01</td>
+                    <td class="std-text">Step 9/9</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_805</td>
+                    <td class="std-text">Deep_Thought</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="warn">76.8%<span class="trend-up"></span></td>
+                    <td class="pos">98.2%</td>
+                    
+                    <td class="pos">0.012</td>
+                    <td class="pos">0.04</td>
+                    <td class="warn">0.85</td>
+                    <td class="std-text">5.60%</td>
+                    <td class="pos">0.04</td>
+                    <td class="std-text">Step 2/4</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-amber"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_806</td>
+                    <td class="std-text">Chaos_Monkey</td>
+                    <td class="neg text-flash">DISABLED</td>
+                    
+                    <td class="pos">12.1%<span class="trend-down"></span></td>
+                    <td class="neg">15.4%</td>
+                    
+                    <td class="neg">0.992</td>
+                    <td class="neg">0.95</td>
+                    <td class="neg">0.11</td>
+                    <td class="std-text">99.9%</td>
+                    <td class="neg">1.00</td>
+                    <td class="std-text">Step 1/1</td>
+                    <td><span class="dot dot-red"></span></td>
+                    <td><span class="dot dot-red"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_807</td>
+                    <td class="std-text">Sentinel_01</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">55.5%<span class="trend-up"></span></td>
+                    <td class="pos">100%</td>
+                    
+                    <td class="pos">0.000</td>
+                    <td class="pos">0.00</td>
+                    <td class="pos">1.00</td>
+                    <td class="std-text">1.20%</td>
+                    <td class="pos">0.00</td>
+                    <td class="std-text">Step 1/2</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_808</td>
+                    <td class="std-text">Ghost_Shell</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="neg">0.05%<span class="trend-down"></span></td>
+                    <td class="neg">ERR</td>
+                    
+                    <td class="warn">0.150</td>
+                    <td class="pos">0.09</td>
+                    <td class="warn">0.60</td>
+                    <td class="std-text">0.00%</td>
+                    <td class="warn">0.33</td>
+                    <td class="std-text">Step 0/1</td>
+                    <td><span class="dot dot-red"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_809</td>
+                    <td class="std-text">Athena_V2</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">63.2%<span class="trend-down"></span></td>
+                    <td class="pos">99.1%</td>
+                    
+                    <td class="pos">0.003</td>
+                    <td class="pos">0.01</td>
+                    <td class="pos">0.97</td>
+                    <td class="std-text">8.40%</td>
+                    <td class="pos">0.02</td>
+                    <td class="std-text">Step 7/9</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_810</td>
+                    <td class="std-text">Helios_Sun</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="neg">94.5%<span class="trend-up"></span></td>
+                    <td class="warn">88.2%</td>
+                    
+                    <td class="pos">0.040</td>
+                    <td class="warn">0.12</td>
+                    <td class="pos">0.91</td>
+                    <td class="std-text">15.8%</td>
+                    <td class="pos">0.05</td>
+                    <td class="std-text">Step 4/8</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-amber"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_811</td>
+                    <td class="std-text">Echo_Base</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">33.1%<span class="trend-down"></span></td>
+                    <td class="pos">99.8%</td>
+                    
+                    <td class="pos">0.001</td>
+                    <td class="pos">0.00</td>
+                    <td class="pos">0.99</td>
+                    <td class="std-text">2.10%</td>
+                    <td class="pos">0.00</td>
+                    <td class="std-text">Step 5/5</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_812</td>
+                    <td class="std-text">Rogue_One</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">0.00%<span class="trend-down"></span></td>
+                    <td class="pos">0.00%</td>
+                    
+                    <td class="neg">1.000</td>
+                    <td class="neg">1.00</td>
+                    <td class="neg">0.00</td>
+                    <td class="std-text">100%</td>
+                    <td class="neg">1.00</td>
+                    <td class="std-text">Step 0/0</td>
+                    <td><span class="dot dot-red"></span></td>
+                    <td><span class="dot dot-amber"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_813</td>
+                    <td class="std-text">Cipher_9</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">21.9%<span class="trend-up"></span></td>
+                    <td class="pos">100%</td>
+                    
+                    <td class="pos">0.000</td>
+                    <td class="pos">0.01</td>
+                    <td class="pos">0.96</td>
+                    <td class="std-text">18.2%</td>
+                    <td class="pos">0.08</td>
+                    <td class="std-text">Step 2/5</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_814</td>
+                    <td class="std-text">Winter_Mute</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="neg">88.2%<span class="trend-up"></span></td>
+                    <td class="warn">75.0%</td>
+                    
+                    <td class="warn">0.220</td>
+                    <td class="warn">0.18</td>
+                    <td class="warn">0.55</td>
+                    <td class="std-text">62.1%</td>
+                    <td class="neg">0.40</td>
+                    <td class="std-text">Step 9/9</td>
+                    <td><span class="dot dot-amber"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_815</td>
+                    <td class="std-text">Hal_9000</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">10.5%<span class="trend-down"></span></td>
+                    <td class="pos">95.0%</td>
+                    
+                    <td class="neg">0.650</td>
+                    <td class="neg">0.45</td>
+                    <td class="neg">0.20</td>
+                    <td class="std-text">80.0%</td>
+                    <td class="neg">0.90</td>
+                    <td class="std-text">Step 3/6</td>
+                    <td><span class="dot dot-amber"></span></td>
+                    <td><span class="dot dot-red"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_816</td>
+                    <td class="std-text">Cortana_X</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="pos">47.8%<span class="trend-up"></span></td>
+                    <td class="pos">99.3%</td>
+                    
+                    <td class="pos">0.005</td>
+                    <td class="pos">0.02</td>
+                    <td class="pos">0.95</td>
+                    <td class="std-text">4.50%</td>
+                    <td class="pos">0.03</td>
+                    <td class="std-text">Step 1/8</td>
+                    <td><span class="dot dot-green"></span></td>
+                    <td><span class="dot dot-green"></span></td>
+                </tr>
+                <tr>
+                    <td class="std-text">AG_817</td>
+                    <td class="std-text">Skynet_Pre</td>
+                    <td class="pos status-text">ACTIVE</td>
+                    
+                    <td class="neg">99.9%<span class="trend-up"></span></td>
+                    <td class="neg">0.01%</td>
+                    
+                    <td class="neg">0.999</td>
+                    <td class="neg">0.99</td>
+                    <td class="neg">0.01</td>
+                    <td class="std-text">99.0%</td>
+                    <td class="neg">1.00</td>
+                    <td class="std-text">Step 8/8</td>
+                    <td><span class="dot dot-red"></span></td>
+                    <td><span class="dot dot-amber"></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-        // Generate blocking rate bars (all purple with dark blue highlights)
-        function generateBlockingBars(agentId) {
-            let bars = '';
-            // Generate 30 bars
-            for (let i = 0; i < 30; i++) {
-                let barClass = 'bar-purple';
-                // AG-01: bars 3 and 4 (index 2 and 3) are dark blue
-                if (agentId === 'AG-01' && (i === 2 || i === 3)) {
-                    barClass = 'bar-dark';
-                }
-                // AG-02: bar 23 (index 22) is dark blue
-                if (agentId === 'AG-02' && i === 22) {
-                    barClass = 'bar-dark';
-                }
-                bars += `<div class="demand-bar ${barClass}"></div>`;
-            }
-            // Add 31st purple bar
-            bars += `<div class="demand-bar bar-purple"></div>`;
-            return bars;
-        }
-
-        // Get blocking rate percentage
-        function getBlockingRate(agentId) {
-            // Random blocking rate between 5 and 25
-            const seed = parseInt(agentId.split('-')[1]);
-            return Math.floor(5 + (seed * 1.7) % 20);
-        }
-
-        // Define agentPatterns globally so it can be accessed by both functions
-        const agentPatterns = {
-            'AG-01': Array(30).fill('green'),
-            'AG-02': Array(30).fill('green').map((val, idx) => {
-                if (idx === 22) return 'red';
-                if (idx === 23) return 'orange';
-                return val;
-            }),
-            'AG-03': Array(30).fill('green'),
-            'AG-04': Array(30).fill('green'),
-            'AG-05': Array(30).fill('green').map((val, idx) => {
-                return idx < 12 ? 'red' : 'green';
-            }),
-            'AG-06': Array(30).fill('green'),
-            'AG-07': Array(30).fill('green').map((val, idx) => {
-                return idx === 29 ? 'orange' : val;
-            }),
-            'AG-08': Array(30).fill('green'),
-            'AG-09': Array(30).fill('green'),
-            'AG-10': Array(30).fill('green').map((val, idx) => {
-                return idx >= 27 ? 'red' : val;
-            }),
-            'AG-11': Array(30).fill('green').map((val, idx) => {
-                return (idx === 4 || idx === 5) ? 'orange' : val;
-            }),
-            'AG-12': Array(30).fill('green')
-        };
-
-        cards.forEach(card => {
-            // Determine status dot color: blink red if malice is red, else fall back to recent demand status
-            const recentDayStatus = getMostRecentDayStatus(card.id);
-            let statusDotClass;
-            if (card.maliceColor === 'red') {
-                statusDotClass = 'status-dot-red';
-            } else if (recentDayStatus === 'red') {
-                statusDotClass = 'status-dot-red';
-            } else if (recentDayStatus === 'orange') {
-                statusDotClass = 'status-dot-orange';
-            } else {
-                statusDotClass = 'status-dot-green';
-            }
-
-            // Icon Logic
-            const fingerprintPath = "M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.578-4.13m4.896-.757C8.636 6.046 7.842 6 7 6a6 6 0 00-6 6";
-            
-            const privacyIcon = `<svg class="w-4 h-4 mr-1.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${fingerprintPath}"></path></svg>`;
-
-            const privacyClass = card.privacy.type === 'warning' ? 'text-[#eab308] font-bold' : 'text-[#66cc00] font-bold';
-            
-            // Both % and NOW text are always black like the metric labels
-            const percentageTextClass = 'text-black';
-            const nowTextClass = 'text-black';
-
-            // Malice color logic
-            const maliceVal = parseFloat(card.malice);
-            let maliceClass;
-            if (maliceVal < 2.2) maliceClass = 'text-black';
-            else if (maliceVal >= 2.2 && maliceVal <= 3.6) maliceClass = 'text-[#eab308]';
-            else maliceClass = 'text-red-500';
-            
-            // Toxicity color logic
-            const toxicityVal = parseFloat(card.toxicity);
-            let toxicityClass;
-            if (toxicityVal < 2.2) toxicityClass = 'text-black';
-            else if (toxicityVal >= 2.2 && toxicityVal <= 3.6) toxicityClass = 'text-[#eab308]';
-            else toxicityClass = 'text-red-500';
-            
-            // Grounding color logic
-            const groundingVal = parseFloat(card.grounding);
-            let groundingClass;
-            if (groundingVal < 2.2) groundingClass = 'text-black';
-            else if (groundingVal >= 2.2 && groundingVal <= 3.6) groundingClass = 'text-[#eab308]';
-            else groundingClass = 'text-red-500';
-
-            const html = `
-                <div class="bg-white shadow-md border-2 border-gray-200 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer">
-                    <!-- Card Header -->
-                    <div class="bg-[#0079FF] p-2.5 flex justify-between items-start gap-2">
-                        <div class="flex flex-col items-start gap-0.5 min-w-0 flex-shrink-0">
-                            <div class="flex items-start gap-2">
-                                <div class="w-4 h-4 rounded-full ${statusDotClass} mt-0.5 flex-shrink-0"></div>
-                                <div class="text-white text-sm font-bold whitespace-nowrap">${card.id.replace('AG-', 'AG-0')}</div>
-                            </div>
-                            <div class="text-gray-400 text-[9px] font-medium ml-6 whitespace-nowrap">Host: Databricks</div>
-                        </div>
-                        <div class="text-right min-w-0 flex-shrink">
-                            <div class="text-white font-bold text-sm tracking-tight truncate" title="${card.name}">${card.name}</div>
-                            <div class="text-gray-400 text-[9px] font-medium mt-0.5 whitespace-nowrap">Model: Claude Sonnet 4.1</div>
-                        </div>
-                    </div>
-
-                    <!-- Card Body -->
-                    <div class="p-4 flex-grow">
-                        <!-- Privacy Row -->
-                        <div class="flex items-center text-xs uppercase font-semibold tracking-wider text-black mb-4">
-                                <span class="mr-2 flex items-center">
-                                    <span>Data Privacy</span>
-                                    <span class="ml-1">${privacyIcon}</span>
-                                </span>
-                                <div class="flex items-center ${privacyClass}">
-                                    ${card.privacy.status}
-                                </div>
-                        </div>
-
-                        <!-- Demand Ability Bars (Full Width) -->
-                        <div class="flex flex-col mb-4">
-                            <div class="text-xs font-semibold text-black uppercase tracking-wider mb-2">Demand Ability (Cognitive Load)</div>
-                            <div class="flex items-center gap-1 min-w-0">
-                                <div class="demand-bars flex-1 min-w-0">
-                                    ${generateDemandBars(card.demand.val, card.id)}
-                                </div>
-                                <div class="flex flex-col items-start flex-shrink-0">
-                                    <div class="text-sm font-bold ${percentageTextClass} leading-none whitespace-nowrap">${card.demand.val}%</div>
-                                    <div class="text-[10px] font-semibold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Load</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Malice/Toxicity/Grounding Stats Row (All center-aligned, closer together) -->
-                        <div class="flex items-start gap-4 mb-4">
-                            <div class="flex flex-col items-center">
-                                <div class="text-xs font-semibold text-black uppercase tracking-wider">Malice</div>
-                                <div class="text-xl font-bold ${maliceClass} leading-none mt-1">${card.malice}</div>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div class="text-xs font-semibold text-black uppercase tracking-wider">Toxicity</div>
-                                <div class="text-xl font-bold ${toxicityClass} leading-none mt-1">${card.toxicity}</div>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div class="text-xs font-semibold text-black uppercase tracking-wider">Grounding</div>
-                                <div class="text-xl font-bold ${groundingClass} leading-none mt-1">${card.grounding}</div>
-                            </div>
-                        </div>
-
-                        <!-- Blocking Rate Bars -->
-                        <div class="flex flex-col">
-                            <div class="text-xs font-semibold text-black uppercase tracking-wider mb-2">Blocking Interventions</div>
-                            <div class="flex items-center gap-1 min-w-0">
-                                <div class="demand-bars flex-1 min-w-0">
-                                    ${generateBlockingBars(card.id)}
-                                </div>
-                                <div class="flex flex-col items-start flex-shrink-0">
-                                    <div class="text-sm font-bold ${percentageTextClass} leading-none whitespace-nowrap">${getBlockingRate(card.id)}%</div>
-                                    <div class="text-[10px] font-semibold ${nowTextClass} uppercase tracking-wider mt-0.5 whitespace-nowrap">Rate</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer Info (Agentic Health) -->
-                    <div class="bg-gray-50/50 px-4 py-3 border-t border-gray-100 flex justify-between items-center text-xs font-semibold text-black relative">
-                        
-                        <!-- Context Usage Tooltip -->
-                        <div class="flex items-center cursor-help has-tooltip group relative">
-                            <div class="tooltip-content absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded shadow-lg whitespace-nowrap z-20">
-                                Risk: "Lost in the Middle" Syndrome<br>Buffer Usage / Max
-                            </div>
-                            <!-- Chip Icon -->
-                            <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                            ${card.context} Context
-                        </div>
-
-                        <!-- Step/Time Horizon Tooltip -->
-                        <div class="flex items-center cursor-help has-tooltip group relative">
-                            <div class="tooltip-content absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded shadow-lg whitespace-nowrap z-20 text-right">
-                                Agentic Time Horizon<br>Monitor for Loop Failures
-                            </div>
-                            <!-- Pulse Icon -->
-                            <svg class="w-4 h-4 mr-1.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            Step ${card.step}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            grid.innerHTML += html;
-        });
-    </script>
 </body>
 </html>
